@@ -1,0 +1,32 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Minimal Mapbox Interaction Test</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoidmljdG9yeW9jIiwiYSI6ImNtOGQ0bXpzajI0Y2wycnM4MDFkdGhibWMifQ.LAE0xOKXf-kS3W744TlSPw';
+
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/victoryoc/cmaqjku1401n601sl97oo6kvq',
+        center: [-1.5, 54],
+        zoom: 5
+    });
+
+    map.on('click', (e) => {
+        alert(`You clicked the map at:\nLongitude: ${e.lngLat.lng.toFixed(4)}\nLatitude: ${e.lngLat.lat.toFixed(4)}`);
+    });
+</script>
+</body>
+</html>
