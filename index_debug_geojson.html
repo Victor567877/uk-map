@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>GeoJSON Debug Map</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoidmljdG9yeW9jIiwiYSI6ImNtOGQ0bXpzajI0Y2wycnM4MDFkdGhibWMifQ.LAE0xOKXf-kS3W744TlSPw';
+
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/victoryoc/cmaqjku1401n601sl97oo6kvq?cacheBust=' + Date.now(),
+        center: [-1.5, 54],
+        zoom: 4
+    });
+
+    map.on('load', () => {
+        console.log("✅ Map loaded");
+
+        fetch('meteorites.geojson')
+            .then(response => {
+                if (!response.ok) throw new Error('GeoJSON failed to load');
+                return response.json();
+            })
+            .then(data => {
+                console.log("✅ GeoJSON loaded:", data);
+
+                map.addSource('meteorites-debug', {
+                    type: 'geojson',
+                    data: data
+                });
+
+                map.addLayer({
+                    id: 'meteorite-debug-points',
+                    type: 'circle',
+                    source: 'meteorites-debug',
+                    paint: {
+                        'circle-radius': 6,
+                        'circle-color': '#FF5733',
+                        'circle-stroke-width': 1,
+                        'circle-stroke-color': '#fff'
+                    }
+                });
+
+                map.on('click', 'meteorite-debug-points', (e) => {
+                    const props = e.features[0].properties;
+                    const coords = e.features[0].geometry.coordinates.slice();
+                    console.log("🟠 Clicked feature:", props);
+
+                    new mapboxgl.Popup()
+                        .setLngLat(coords)
+                        .setHTML(`<strong>${props.name}</strong><br>Mass: ${props.mass} g`)
+                        .addTo(map);
+                });
+
+                map.on('mouseenter', 'meteorite-debug-points', () => {
+                    map.getCanvas().style.cursor = 'pointer';
+                });
+
+                map.on('mouseleave', 'meteorite-debug-points', () => {
+                    map.getCanvas().style.cursor = '';
+                });
+            })
+            .catch(error => {
+                console.error("❌ Failed to load GeoJSON:", error);
+            });
+    });
+</script>
+</body>
+</html>
